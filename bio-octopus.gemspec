@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.authors = ["Ben J Woodcroft"]
   s.date = %q{2011-04-10}
   s.default_executable = %q{biooctopus}
-  s.description = %q{TODO: longer description of your gem}
+  s.description = %q{Running and parsing of the protein transmembrane domain predictor octopus}
   s.email = %q{gmail.com after donttrustben}
   s.executables = ["biooctopus"]
   s.extra_rdoc_files = [
@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.6.2}
-  s.summary = %q{TODO: one-line summary of your gem}
+  s.summary = %q{Running and parsing of the protein transmembrane domain predictor octopus}
   s.test_files = [
     "test/helper.rb",
     "test/test_bio-octopus.rb"
