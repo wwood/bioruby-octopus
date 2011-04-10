@@ -1,6 +1,6 @@
 = bio-octopus
 
-Description goes here.
+A bioruby plugin for running and parsing octopus, available from http://octopus.cbr.su.se/ Currently, the plugin is not Ruby 1.9 (only 1.8) compatible, because of the dependency on the rio gem.
 
 == Contributing to bio-octopus
  
