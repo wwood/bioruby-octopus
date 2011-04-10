@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "bin/biooctopus",
+    "bio-octopus.gemspec",
     "lib/bio-octopus.rb",
     "lib/bio/appl/octopus.rb",
     "test/helper.rb",
