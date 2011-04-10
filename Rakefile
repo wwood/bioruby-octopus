@@ -15,8 +15,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "bio-octopus"
   gem.homepage = "http://github.com/wwood/bioruby-octopus"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Running and parsing of the protein transmembrane domain predictor octopus}
+  gem.description = %Q{Running and parsing of the protein transmembrane domain predictor octopus}
   gem.email = "gmail.com after donttrustben"
   gem.authors = ["Ben J Woodcroft"]
   # Include your dependencies below. Runtime dependencies are required when using your gem,
