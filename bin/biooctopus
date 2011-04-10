@@ -1,76 +1,36 @@
 #!/usr/bin/env ruby
 #
 # BioRuby bio-octopus Plugin
-# Version 0.0.0 
+# Version 0.0.1
 # Author:: Ben J Woodcroft
 # Copyright:: 2011
 # License:: The Ruby License
 
- USAGE = "Describe biooctopus"
+ USAGE = "This scripts reads a fasta file in, and uses the BLOCTOPUS and SPOCTOPUS scripts, returning a structured result for each transmembrane domain. Requires the scripts to be installed before use. They are available from http://octopus.cbr.su.se/"
 
-if ARGV.size == 0
-  print USAGE
-end
+if $0 == __FILE__
+  runner = Bio::Spoctopus::Wrapper.new
 
-require 'bio-octopus'
-require 'optparse'
+  Bio::FlatFile.auto(ARGF).each do |seq|
+    result = runner.calculate(seq.seq)
+    name = seq.definition
 
-# Uncomment when using the bio-logger 
-# require 'bio-logger'
-# Bio::Log::CLI.logger('stderr')
-# Bio::Log::CLI.trace('info')
-
-options = {:example_switch=>false,:show_help=>false}
-opts = OptionParser.new do |o|
-  o.banner = "Usage: #{File.basename($0)} [options] reponame\ne.g. #{File.basename($0)} the-perfect-gem"
-
-  o.on('--example_parameter [EXAMPLE_PARAMETER]', 'TODO: put a description for the PARAMETER') do |example_parameter|
-    # TODO: your logic here, below an example
-    options[:example_parameter] = 'this is a parameter'
+    if result.has_domain?
+      # At least one TMD found. Output each on a separate line
+      result.transmembrane_domains.each do |tmd|
+        puts [
+          name,
+          result.transmembrane_type,
+          tmd.start,
+          tmd.stop,
+          tmd.orientation
+        ].join("\t")
+      end
+    else
+      puts [
+        name,
+        'No Transmembrane Domain Found'
+      ].join("\t")
+    end
   end
-  
-  o.separator ""
-  o.on("--switch-example", 'TODO: put a description for the SWITCH') do
-    # TODO: your logic here, below an example
-    self[:example_switch] = true
-  end
-
-  # Uncomment the following when using the bio-logger 
-  # o.separator ""
-  # o.on("--logger filename",String,"Log to file (default stderr)") do | name |
-  #   Bio::Log::CLI.logger(name)
-  # end
-  #
-  # o.on("--trace options",String,"Set log level (default INFO, see bio-logger)") do | s |
-  #   Bio::Log::CLI.trace(s)
-  # end
-  # 
-  # o.on("-q", "--quiet", "Run quietly") do |q|
-  #   Bio::Log::CLI.trace('error')
-  # end
-  # 
-  # o.on("-v", "--verbose", "Run verbosely") do |v|
-  #   Bio::Log::CLI.trace('info')
-  # end
-  # 
-  # o.on("--debug", "Show debug messages") do |v|
-  #   Bio::Log::CLI.trace('debug')
-  # end
-
-  o.separator ""
-  o.on_tail('-h', '--help', 'display this help and exit') do
-    options[:show_help] = true
-  end
-end
-
-begin
-  opts.parse!(ARGV)
-
-  # Uncomment the following when using the bio-logger 
-  # Bio::Log::CLI.configure('bio-octopus')
-
-  # TODO: your code here
-  # use options for your logic
-rescue OptionParser::InvalidOption => e
-  options[:invalid_argument] = e.message
 end
