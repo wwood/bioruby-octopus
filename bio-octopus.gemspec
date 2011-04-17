@@ -5,15 +5,14 @@
 
 Gem::Specification.new do |s|
   s.name = %q{bio-octopus}
-  s.version = "0.0.1"
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ben J Woodcroft"]
-  s.date = %q{2011-04-10}
-  s.default_executable = %q{biooctopus}
+  s.date = %q{2011-04-17}
   s.description = %q{Running and parsing of the protein transmembrane domain predictor octopus}
   s.email = %q{gmail.com after donttrustben}
-  s.executables = ["biooctopus"]
+  s.executables = ["biooctopus.rb", "biooctopus"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.rdoc"
@@ -29,6 +28,10 @@ Gem::Specification.new do |s|
     "bio-octopus.gemspec",
     "lib/bio-octopus.rb",
     "lib/bio/appl/octopus.rb",
+    "test/data/dummyLegacyDb",
+    "test/data/dummyLegacyDb.phr",
+    "test/data/dummyLegacyDb.pin",
+    "test/data/dummyLegacyDb.psq",
     "test/helper.rb",
     "test/test_bio-octopus.rb"
   ]
