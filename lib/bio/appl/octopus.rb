@@ -1,15 +1,23 @@
 require 'fastercsv'
 require 'bio-tm_hmm'
+require 'rio'
 
 module Bio
   class Spoctopus
     class Wrapper
       TMP_SEQUENCE_NAME = 'wrapperSeq'
+      BLOCTOPUS_DEFAULT_PATH='BLOCTOPUS.sh'
+      SPOCTOPUS_DEFAULT_PATH='SPOCTOPUS.sh'
+      
+      # The path to the BLOCTOPUS executable, by default BLOCTOPUS_DEFAULT_PATH
+      attr_accessor :bloctopus_executable
+      
+      # The path to the SPOCTOPUS executable, by default SPOCTOPUS_DEFAULT_PATH
+      attr_accessor :spoctopus_executable
 
       def calculate(sequence, blast_database_path)
         # Remove stop codons, as these mess things up for the predictor
         sequence.gsub!('*','')
-
 
         rio(:tempdir) do |d| # Do all the work in a temporary directory
           FileUtils.cd(d.to_s) do
@@ -36,9 +44,10 @@ module Bio
             # ben@ben:~/bioinfo/spoctopus$ ./BLOCTOPUS.sh /tmp/spoctopus/names /tmp/spoctopus/fa
             # /tmp/spoctopus/tmd blastall blastpgp`
             # /blastdb/UniProt15/uniprot_sprot.fasta makemat -P
+            # 
             Tempfile.open('octopuserr') do |err|
               result = system [
-                'BLOCTOPUS.sh',
+                @bloctopus_executable.nil? ? BLOCTOPUS_DEFAULT_PATH : @bloctopus_executable,
                 "#{Dir.pwd}/names",
                 "#{Dir.pwd}/fasta",
                 "#{Dir.pwd}/tmd",
@@ -47,12 +56,12 @@ module Bio
                 "'#{blast_database_path}'",
                 'makemat',
                 '-P',
-                '>/dev/null' # SPOCTOPUS doesn't understand the concept of STDERR
-                #                "2>#{err.path}"
+                '>/dev/null', # SPOCTOPUS doesn't understand the concept of STDERR
+                "2>#{err.path}"
               ].join(' ')
 
               if !result
-                raise Exception, "Running BLOCTOPUS program failed. $? was #{$?.inspect}. STDERR was #{err.read}"
+                raise Exception, "Running BLOCTOPUS program failed. $? was #{$?.inspect}. Has it been installed properly? STDERR: #{File.open(err.path).read}"
               end
             end
 
@@ -64,17 +73,17 @@ module Bio
             # /tmp/spoctopus/tmd/
             Tempfile.open('octopuserr') do |err|
               result = system [
-                'SPOCTOPUS.sh',
+                @spoctopus_executable.nil? ? SPOCTOPUS_DEFAULT_PATH : @soctopus_executable,
                 "#{Dir.pwd}/names",
                 "#{Dir.pwd}/tmd/PSSM_PRF_FILES/",
                 "#{Dir.pwd}/tmd/RAW_PRF_FILES/",
                 "#{Dir.pwd}/tmd/",
-                '>/dev/null' # SPOCTOPUS doesn't understand the concept of STDERR
-                #                "2>#{err.path}"
+                '>/dev/null', # SPOCTOPUS doesn't understand the concept of STDERR
+                "2>#{err.path}"
               ].join(' ')
 
               if !result
-                raise Exception, "Running SPOCTOPUS program failed. $? was #{$?.inspect}. STDERR was #{err.read}"
+                raise Exception, "Running SPOCTOPUS program failed. $? was #{$?.inspect}. Has it been installed properly? STDERR: #{File.open(err.path).read}"
               end
             end
             
@@ -109,7 +118,7 @@ module Bio
         
         # Error checking
         unless lines[0].match(/^\>/) and lines.length > 1
-          raise Exception, "Unexpected SPOCTOPUS output file: #{spoctopus_output.inspect}"
+          raise Exception, "Unexpected OCTOPUS output file: #{spoctopus_output.inspect}. STDERR: #{File.open(err.path).read}"
         end
 
         seq = lines[1..(lines.length-1)].join('')
@@ -171,58 +180,6 @@ module Bio
         end
 
         return tmd
-      end
-    end
-
-    # Read the output from this file when it is run as a script and return
-    # useful programmatic objects - TransmembraneProteins
-    #
-    #pfa|PFD0635c	I	1833	1853	outside_in
-    #pfa|PFD0595c	I	2	22	outside_in
-    #pfa|PFB0610c	No Transmembrane Domain Found
-    #pfa|PFF1525c	Unknown	2	22	outside_in
-    #pfa|PFF1525c	Unknown	160	180	inside_out
-    #pfa|PFF1525c	Unknown	188	208	outside_in
-    class WrapperParser
-      attr_accessor :io
-
-      def initialize(io)
-        @io = io
-      end
-
-      # Return an array of transmembrane proteins
-      def transmembrane_proteins
-        transmembrane_proteins = []
-        current_transmembrane_protein = nil
-
-        FasterCSV.foreach(@io, :col_sep => "\t") do |row|
-          next if row.length == 0
-          current_protein_id = row[0]
-          
-          # if the protein ID changes then return the last protein 
-          # (if there is one)
-          unless current_transmembrane_protein.nil? or
-              current_transmembrane_protein.name == current_protein_id
-            transmembrane_proteins.push current_transmembrane_protein
-            current_transmembrane_protein = nil
-          end
-
-          # deal with no tmd proteins
-          if row[1] == 'No Transmembrane Domain Found'
-            prot = Bio::Transmembrane::OrientedTransmembraneDomainProtein.new
-            prot.name = current_protein_id
-            transmembrane_proteins.push prot
-            current_transmembrane_protein = nil
-          else
-            current_transmembrane_protein ||= Bio::Transmembrane::OrientedTransmembraneDomainProtein.new
-            current_transmembrane_protein.name = current_protein_id
-            current_transmembrane_protein.transmembrane_domains.push Bio::Transmembrane::OrientedTransmembraneDomain.new(row[2],row[3],row[4])
-          end
-        end
-        # push the last one
-        transmembrane_proteins.push current_transmembrane_protein unless current_transmembrane_protein.nil?
-
-        return transmembrane_proteins
       end
     end
   end
