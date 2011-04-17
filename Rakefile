@@ -23,6 +23,9 @@ Jeweler::Tasks.new do |gem|
   # and development dependencies are only needed for development (ie running rake tasks, tests, etc)
   #  gem.add_runtime_dependency 'jabber4r', '> 0.1'
   #  gem.add_development_dependency 'rspec', '> 1.2.3'
+
+  #included so the IDE recognizes the file type of bin/biooctopus, but these are hard-linked so just use one of these two.
+  gem.files.exclude 'bin/biooctopus.rb' 
 end
 Jeweler::RubygemsDotOrgTasks.new
 

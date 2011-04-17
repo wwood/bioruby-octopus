@@ -5,14 +5,35 @@
 # Author:: Ben J Woodcroft
 # Copyright:: 2011
 # License:: The Ruby License
+require 'rubygems'
+require 'optparse'
+require 'bio'
+require 'bio-octopus'
 
- USAGE = "This scripts reads a fasta file in, and uses the BLOCTOPUS and SPOCTOPUS scripts, returning a structured result for each transmembrane domain. Requires the scripts to be installed before use. They are available from http://octopus.cbr.su.se/"
+USAGE = "This scripts reads a fasta file in, and uses the BLOCTOPUS and SPOCTOPUS scripts, returning a structured result for each transmembrane domain. Requires the scripts and a legacy BLAST formated database to be installed before use. They are available from http://octopus.cbr.su.se/"
 
 if $0 == __FILE__
+  o = OptionParser.new do |opts|
+    indent = '    '
+    opts.banner = [
+      "Usage: biooctopus <FASTA_FILE> <BLASTDB>\n",
+      USAGE
+    ].flatten
+  end
+  o.parse!
+  
+  unless ARGV.length == 2
+  	puts o.help
+  	exit
+  end
+  
+  fasta_path = ARGV[0]
+  blastdb_path = ARGV[1]
+
   runner = Bio::Spoctopus::Wrapper.new
 
-  Bio::FlatFile.auto(ARGF).each do |seq|
-    result = runner.calculate(seq.seq)
+  Bio::FlatFile.auto(File.open(fasta_path)).each do |seq|
+    result = runner.calculate(seq.seq, blastdb_path)
     name = seq.definition
 
     if result.has_domain?
