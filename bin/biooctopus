@@ -21,12 +21,12 @@ if $0 == __FILE__
     ].flatten
   end
   o.parse!
-  
+
   unless ARGV.length == 2
-  	puts o.help
-  	exit
+    puts o.help
+    exit
   end
-  
+
   fasta_path = ARGV[0]
   blastdb_path = ARGV[1]
 
@@ -35,6 +35,21 @@ if $0 == __FILE__
   Bio::FlatFile.auto(File.open(fasta_path)).each do |seq|
     result = runner.calculate(seq.seq, blastdb_path)
     name = seq.definition
+
+    # Output singal peptide if it has one
+    if result.signal?
+      puts [
+    		name,
+    		'Signal peptide',
+    		result.signal_peptide.start,
+    		result.signal_peptide.stop
+    	].join("\t")
+    else
+      puts [
+    		name,
+    		'No signal peptide found'
+    	].join("\t")
+    end
 
     if result.has_domain?
       # At least one TMD found. Output each on a separate line
@@ -50,7 +65,7 @@ if $0 == __FILE__
     else
       puts [
         name,
-        'No Transmembrane Domain Found'
+        'No transmembrane domain found'
       ].join("\t")
     end
   end
