@@ -2,6 +2,12 @@
 
 A bioruby plugin for running and parsing octopus, available from http://octopus.cbr.su.se/ Currently, the plugin is not Ruby 1.9 (only 1.8) compatible, because of the dependency on the rio gem.
 
+To run it as a script, a fasta file of sequences to predict, and a database formatted in legacy blast database format needs to be specified:
+
+    $ /usr/local/rvm/gems/ruby-1.8.7-p334/gems/bio-octopus-0.1.0/bin/biooctopus my.fasta /blastdb/UniProt2011_04/uniprot_sprot.fasta
+
+Output are topology predictions, including signal peptide and transmembrane domain predictions. If that is not the best format for you, look at the script file and modify it - it is just a front-end.
+
 == Contributing to bio-octopus
  
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
