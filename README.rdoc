@@ -6,7 +6,10 @@ To run it as a script, a fasta file of sequences to predict, and a database form
 
     $ /usr/local/rvm/gems/ruby-1.8.7-p334/gems/bio-octopus-0.1.0/bin/biooctopus my.fasta /blastdb/UniProt2011_04/uniprot_sprot.fasta
 
-Output are topology predictions, including signal peptide and transmembrane domain predictions. If that is not the best format for you, look at the script file and modify it - it is just a front-end.
+Output are topology predictions, including signal peptide and transmembrane domain predictions. If that is not the best format for you, look at the script file and modify it - it is just a front-end. Also required are:
+* a working install of SPOCTOPUS
+* NCBI legacy blast
+Binaries for these must be accessible in the PATH.
 
 == Contributing to bio-octopus
  
